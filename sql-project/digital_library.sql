@@ -1,11 +1,6 @@
--- Reset database (so it runs clean every time)
 
 CREATE DATABASE digital_library;
 USE digital_library;
-
--- -----------------------------
--- TABLES
--- -----------------------------
 
 CREATE TABLE Books (
     book_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -33,11 +28,7 @@ CREATE TABLE IssuedBooks (
     FOREIGN KEY (student_id) REFERENCES Students(student_id)
 );
 
--- -----------------------------
--- SAMPLE DATA (HUMAN-LIKE)
--- -----------------------------
-
--- Books (popular & familiar)
+-- Books
 INSERT INTO Books (title, author, category) VALUES
 ('Harry Potter', 'J.K. Rowling', 'Fiction'),
 ('Wings of Fire', 'A.P.J Abdul Kalam', 'Biography'),
@@ -46,7 +37,7 @@ INSERT INTO Books (title, author, category) VALUES
 ('Ikigai', 'Hector Garcia', 'Self-help'),
 ('A Brief History of Time', 'Stephen Hawking', 'Science');
 
--- Students (simple names)
+-- Students 
 INSERT INTO Students (name, email, join_date) VALUES
 ('Ravi', 'ravi@gmail.com', '2021-06-10'),
 ('Sneha', 'sneha@gmail.com', '2022-01-15'),
@@ -63,9 +54,8 @@ INSERT INTO IssuedBooks (book_id, student_id, issue_date, return_date) VALUES
 (5, 4, CURDATE() - INTERVAL 10 DAY, NULL),
 (6, 2, CURDATE() - INTERVAL 25 DAY, NULL);   -- overdue
 
--- -----------------------------
--- 1. OVERDUE BOOKS (14 DAYS)
--- -----------------------------
+
+-- 1. OVERDUE BOOKS 
 
 SELECT 
     s.name,
@@ -77,9 +67,7 @@ JOIN Books b ON ib.book_id = b.book_id
 WHERE ib.return_date IS NULL
 AND ib.issue_date < CURDATE() - INTERVAL 14 DAY;
 
--- -----------------------------
 -- 2. POPULARITY INDEX
--- -----------------------------
 
 SELECT 
     b.category,
@@ -89,11 +77,8 @@ JOIN Books b ON ib.book_id = b.book_id
 GROUP BY b.category
 ORDER BY total_borrows DESC;
 
--- -----------------------------
 -- 3. INACTIVE STUDENTS (3 YEARS)
--- -----------------------------
 
--- View first
 SELECT s.student_id, s.name
 FROM Students s
 LEFT JOIN IssuedBooks ib ON s.student_id = ib.student_id
@@ -101,7 +86,7 @@ GROUP BY s.student_id
 HAVING MAX(ib.issue_date) IS NULL 
    OR MAX(ib.issue_date) < CURDATE() - INTERVAL 3 YEAR;
 
--- Update instead of delete (better practice)
+-- Update
 UPDATE Students s
 JOIN (
     SELECT s.student_id
