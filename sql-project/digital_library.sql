@@ -1,4 +1,4 @@
-
+--create database
 CREATE DATABASE digital_library;
 USE digital_library;
 
